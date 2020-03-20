@@ -1,6 +1,6 @@
 package models;
 
-public class Publication {
+public abstract class Publication {
     private String title;
     private String publisher;
     private int year;
@@ -23,10 +23,16 @@ public class Publication {
         return year;
     }
 
+    public abstract String convertToCSV();
+
     @Override
     public String toString() {
         return "title: " + title +
                 ", publisher: " + publisher  +
-                ", year: " + year;
+                ", year: " + year + " ";
+    }
+
+    protected String publicationConvertToCsv() {
+        return title+';'+year+';'+publisher;
     }
 }

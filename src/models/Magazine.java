@@ -5,7 +5,7 @@ public class Magazine extends Publication{
     private String day;
     private String language;
 
-    public Magazine(String title,int year,String publisher,String language,String month, String day ) {
+    public Magazine(String title,int year,String publisher,String month, String day, String language) {
         super(title,publisher,year);
         this.month = month;
         this.day = day;
@@ -22,6 +22,12 @@ public class Magazine extends Publication{
 
     public String getLanguage() {
         return language;
+    }
+
+    @Override
+    public String convertToCSV() {
+        return "Magazyn;" + super.publicationConvertToCsv() +
+                ";"+month+";"+day+";"+language;
     }
 
     @Override

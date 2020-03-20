@@ -5,7 +5,7 @@ public class Book extends Publication {
     private int pages;
     private String isbn;
 
-    public Book(String title, String author, int year, int pages,String publisher,String isbn ) {
+    public Book(String title,int year,String publisher,String author,int pages,String isbn ) {
         super(title,publisher,year);
         this.author = author;
         this.pages = pages;
@@ -22,6 +22,12 @@ public class Book extends Publication {
 
     public String getIsbn() {
         return isbn;
+    }
+
+    @Override
+    public String convertToCSV() {
+        return "Książka;" + super.publicationConvertToCsv() +
+                ";"+author+";"+pages+";"+isbn;
     }
 
     @Override

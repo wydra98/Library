@@ -5,6 +5,8 @@ import io.ConsolePrinter;
 import io.DataReader;
 import models.Library;
 
+import java.io.FileNotFoundException;
+
 public class FileManagerBuilder {
     DataReader dataReader;
     ConsolePrinter printer;
@@ -21,15 +23,12 @@ public class FileManagerBuilder {
         }
     }
 
-    public FileManager build(){
+    public FileManager build() throws FileNotFoundException {
         printFileOption();
         FileOption option = getOption();
         switch(option){
             case CSV:
                 return new CsvFileManager();
-
-            case SERIAL:
-                return new SerializableFileManager();
 
             default:
                 throw new NoSuchFileTypeException("Nieobsługiwany typ danych");

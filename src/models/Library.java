@@ -11,18 +11,9 @@ public class Library {
         return publicationRepository;
     }
 
-    public void addBook(Book b){
+    public void add(Publication pub){
         if(booksNumber<MAX_PUBLICATION){
-            publicationRepository[booksNumber] = b;
-            booksNumber+=1;
-        }
-        else
-            throw new NoMoreSpaceException("Brak miejsca!");
-    }
-
-    public void addMagazine(Magazine m){
-        if(booksNumber<MAX_PUBLICATION){
-            publicationRepository[booksNumber] = m;
+            publicationRepository[booksNumber] = pub;
             booksNumber+=1;
         }
         else

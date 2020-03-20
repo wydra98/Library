@@ -45,7 +45,7 @@ public class DataReader {
         printer.print("Podaj isbn");
         String isbn = sc.nextLine();
 
-        return new Book(title,author,year, pages,publisher, isbn);
+        return new Book(title, year, publisher, author,pages, isbn);
     }
 
     public Magazine readMagazine(){
@@ -53,16 +53,17 @@ public class DataReader {
         String title = sc.nextLine();
         printer.print("Podaj rok");
         int year = sc.nextInt();
+        sc.nextLine();
         printer.print("Podaj wydawcę");
         String publisher = sc.nextLine();
-        printer.print("Podaj ilość stron");
+        printer.print("Podaj język");
         String language = sc.nextLine();
         printer.print("Podaj miesiąc");
         String month = sc.nextLine();
         printer.print("Podaj dzień");
         String day = sc.nextLine();
 
-        return new Magazine(title,year,publisher,language,month,day);
+        return new Magazine(title,year,publisher,month,day,language);
     }
 
     public void  close(){

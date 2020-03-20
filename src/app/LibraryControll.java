@@ -12,6 +12,7 @@ import models.Library;
 import models.Magazine;
 import models.Publication;
 
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class LibraryControll {
     private Library library;
     private FileManager fileManager;
 
-    LibraryControll(){
+    LibraryControll() throws IOException {
         fileManager = fileManagerBuilder.build();
         try {
             library = fileManager.importData();
@@ -89,7 +90,7 @@ public class LibraryControll {
 
     private void addBook(){
         try{
-            library.addBook(dataReader.readBook());
+            library.add(dataReader.readBook());
         }catch(NoMoreSpaceException e){
             System.out.println(e.getMessage());
         }catch(InputMismatchException e){
@@ -107,7 +108,7 @@ public class LibraryControll {
 
     private void addMagazine(){
         try{
-            library.addBook(dataReader.readBook());
+            library.add(dataReader.readMagazine());
         }catch(NoMoreSpaceException e){
             System.out.println(e.getMessage());
         }catch(InputMismatchException e){
