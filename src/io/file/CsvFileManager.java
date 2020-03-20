@@ -24,7 +24,7 @@ public class CsvFileManager implements FileManager {
 
         try(FileWriter fw = new FileWriter(new File(FILE_NAME));
             BufferedWriter bw = new BufferedWriter(fw)){
-            for(Publication singlePublication : library.getPublicationRepository()){
+            for(Publication singlePublication : library.getAllPublicationInLibrary()){
                 if(singlePublication!=null) {
                     bw.write(singlePublication.convertToCSV());
                     bw.newLine();
@@ -45,12 +45,9 @@ public class CsvFileManager implements FileManager {
         try (FileReader fr = new FileReader(new File(FILE_NAME));
             BufferedReader br = new BufferedReader(fr)){
 
-            String napis = null;
-            Publication obj = null;
-            while ((napis = br.readLine()) != null) {
-                obj = createPublicationObjectFromString(napis);
-                library.add(obj);
-            }
+            br.lines().map((obj) -> createPublicationObjectFromString(obj))
+                    .forEach(library::addPublication);
+
             return library;
         }
         catch(FileNotFoundException e){

@@ -2,6 +2,7 @@ package io;
 
 import models.Book;
 import models.Magazine;
+import models.UserLibrary;
 
 import java.util.Scanner;
 
@@ -65,6 +66,18 @@ public class DataReader {
 
         return new Magazine(title,year,publisher,month,day,language);
     }
+
+    public UserLibrary readUser(){
+        printer.print("Podaj imie");
+        String name = sc.nextLine();
+        printer.print("Podaj nazwisko");
+        String surname = sc.nextLine();
+        printer.print("Podaj pesel");
+        String pesel = sc.nextLine();
+
+        return new UserLibrary(name,surname,pesel);
+    }
+
 
     public void  close(){
         sc.close();

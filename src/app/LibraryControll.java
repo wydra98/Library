@@ -1,23 +1,16 @@
 package app;
 
-import exception.NoMoreSpaceException;
-import exception.NoSuchIndexException;
-import exception.ProblemWithFileException;
+import exception.*;
 import io.ConsolePrinter;
 import io.DataReader;
 import io.file.FileManager;
 import io.file.FileManagerBuilder;
-import models.Book;
-import models.Library;
-import models.Magazine;
-import models.Publication;
+import models.*;
 
 import java.io.IOException;
-import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
-public class LibraryControll {
+public class LibraryControll  {
 
     private ConsolePrinter printer = new ConsolePrinter();
     private DataReader dataReader = new DataReader(printer);
@@ -45,14 +38,41 @@ public class LibraryControll {
                 case ADD_BOOK:
                     addBook();
                     break;
-                case PRINT_BOOK:
-                    printBook();
-                    break;
                 case ADD_MAGAZINE:
                     addMagazine();
                     break;
+                case REMOVE_BOOK:
+                    removeBook();
+                    break;
+                case REMOVE_MAGAZINE:
+                    removeMagazine();
+                    break;
+                case PRINT_BOOK:
+                    printBook();
+                    break;
                 case PRINT_MAGAZINE:
                     printMagazine();
+                    break;
+                case PRINT_ALL:
+                    printAll();
+                    break;
+                case ADD_USER:
+                    addUser();
+                    break;
+                case REMOVE_USER:
+                    removeUser();
+                    break;
+                case ADD_SOMETHING_TO_USER:
+                    addSomethingToUser();
+                    break;
+                case REMOVE_SOMETHING_FROM_USER:
+                    removeSomethingFromUser();
+                    break;
+                case PRINT_USER_BOOKS:
+                    printUserBooks();
+                    break;
+                case PRINT_USERS:
+                    printUsers();
                     break;
                 case EXIT:
                     exit();
@@ -73,7 +93,7 @@ public class LibraryControll {
     private Option getOption() {
         boolean flag = false;
         Option option = null;
-        printer.print("Podaj opcję:");
+        printer.print("\nPodaj opcję:");
         do {
             try {
                 option = Option.getOptionfromUserChoice(dataReader.readOption());
@@ -90,38 +110,176 @@ public class LibraryControll {
 
     private void addBook(){
         try{
-            library.add(dataReader.readBook());
-        }catch(NoMoreSpaceException e){
-            System.out.println(e.getMessage());
+            library.addPublication(dataReader.readBook());
+            printer.print("\n");
+        }catch(InputMismatchException e){
+            printer.print("Zły format danych! Spróbuj jeszcze raz!");
+        }
+    }
+
+    private void addMagazine(){
+        try{
+            library.addPublication(dataReader.readMagazine());
+            printer.print("\n");
+        }catch(InputMismatchException e){
+            printer.print("Zły format danych! Spróbuj jeszcze raz!");
+        }
+    }
+
+    private void removeBook() {
+        try {
+            library.removePublication(dataReader.readBook());
+            printer.print("\n");
+        } catch (InputMismatchException e) {
+            printer.print("Zły format danych! Spróbuj jeszcze raz!");
+        }
+    }
+
+    private void removeMagazine(){
+        try{
+            library.removePublication(dataReader.readMagazine());
+            printer.print("\n");
         }catch(InputMismatchException e){
             printer.print("Zły format danych! Spróbuj jeszcze raz!");
         }
     }
 
     private void printBook(){
-        Publication[] publicationRepository = library.getPublicationRepository();
+        ArrayList<Publication> publicationRepository = library.getAllPublicationInLibrary();
+        Collections.sort(publicationRepository, Comparator.comparing(Publication::getTitle));
         for(Publication singlePublication: publicationRepository){
             if(singlePublication instanceof Book)
             printer.print(singlePublication.toString());
         }
-    }
-
-    private void addMagazine(){
-        try{
-            library.add(dataReader.readMagazine());
-        }catch(NoMoreSpaceException e){
-            System.out.println(e.getMessage());
-        }catch(InputMismatchException e){
-            printer.print("Zły format danych! Spróbuj jeszcze raz!");
-        }
+        printer.print("\n");
     }
 
     private void printMagazine(){
-        Publication[] publicationRepository = library.getPublicationRepository();
+        ArrayList<Publication> publicationRepository = library.getAllPublicationInLibrary();
+        Collections.sort(publicationRepository, Comparator.comparing(Publication::getTitle));
         for(Publication singlePublication: publicationRepository){
             if(singlePublication instanceof Magazine)
                 printer.print(singlePublication.toString());
         }
+        printer.print("\n");
+    }
+
+    private void printAll(){
+        ArrayList<Publication> publicationRepository = library.getAllPublicationInLibrary();
+        Collections.sort(publicationRepository, Comparator.comparing(Publication::getTitle));
+        for(Publication singlePublication: publicationRepository){
+                printer.print(singlePublication.toString());
+        }
+        printer.print("\n");
+    }
+
+    private void addUser(){
+        try{
+            UserLibrary user = dataReader.readUser();
+            if(user.getPesel().length() != 9){
+                throw new WrongLengthException("");
+            }
+            Integer.parseInt(user.getPesel());
+            library.checkIfPeselIsUnique(user.getPesel());
+            library.addUser(user.getPesel(),user);
+        }catch(InputMismatchException e){
+            printer.print("Juz istnieje użytkownika o takim peselu w bazie!\n");
+        }catch (NumberFormatException e) {
+            printer.print("Nie podawaj liter w peselu!\n");
+        }catch (WrongLengthException e) {
+            printer.print("Zła długość peselu!\n");
+        }
+    }
+
+    private void removeUser(){
+        try{
+            printer.print("Którego użytkownika usunąć, podaj pesel?");
+            library.returnUsers().forEach((p)-> System.out.println("Imie: "+p.getName()+
+                    ", nazwisko: "+p.getSurname()+", pesel:"+p.getPesel()));
+            UserLibrary user = dataReader.readUser();
+            library.removeUser(user.getPesel());
+        }catch(InputMismatchException e){
+            printer.print("Zły format danych! Spróbuj jeszcze raz!\n");
+        }
+    }
+
+    private void addSomethingToUser(){
+        try{
+            printer.print("Którego użytkownika wybrać, podaj pesel?");
+            library.returnUsers().forEach((p)-> System.out.println("Imie: "+p.getName()+
+                    ", nazwisko: "+p.getSurname()+", pesel:"+p.getPesel()));
+            String user = dataReader.readString();
+            UserLibrary lib = library.showUserLibrary(user);
+
+            printer.print("Którą ksiązkę dodać do użytkownika?");
+            printAll();
+            Book book = dataReader.readBook();
+            lib.addPublication(book);
+        }
+        catch(NoBooksException e){
+            printer.print(e.getMessage());
+        }
+        catch(IllegalArgumentException e){
+            printer.print("Nie ma takiego peselu w bazie!\n");
+        }
+        catch (InputMismatchException e) {
+            printer.print("Zły format danych! Spróbuj jeszcze raz!\n");
+        }
+    }
+
+    private void removeSomethingFromUser(){
+        try {
+            printer.print("Którego użytkownika wybrać, podaj pesel?");
+            library.returnUsers().forEach((p)-> System.out.println("Imie: "+p.getName()+
+                    ", nazwisko: "+p.getSurname()+", pesel:"+p.getPesel()));
+            String user = dataReader.readString();
+            UserLibrary lib = library.showUserLibrary(user);
+
+            printer.print("Którą ksiązkę usunąć od użytkownika?");
+            printAll();
+            Book book = dataReader.readBook();
+            library.checkThisBookInRepo(book);
+            lib.removePublication(book);
+        }
+
+        catch(NoBooksException e){
+            printer.print(e.getMessage());
+        }
+        catch(IllegalArgumentException e){
+            printer.print("Nie ma takiego peselu w bazie!\n");
+        }
+        catch (InputMismatchException e) {
+            printer.print("Zły format danych! Spróbuj jeszcze raz!\n");
+        }
+    }
+
+    private void printUserBooks(){
+        try {
+            printer.print("Którego użytkownika wybrać, podaj pesel?");
+            library.returnUsers().forEach((p)-> System.out.println("Imie: "+p.getName()+
+                                                ", nazwisko: "+p.getSurname()+", pesel:"+p.getPesel()));
+            String user = dataReader.readString();
+            UserLibrary lib = library.showUserLibrary(user);
+            printer.print(lib.toString());
+        }
+        catch(IllegalArgumentException e){
+            printer.print("Nie ma takiego peselu w bazie!\n");
+        }
+        catch(NullPointerException e){
+            printer.print("Spróbuj jeszcze raz!\n");
+        }
+    }
+
+    private void printUsers(){
+        Map<String, UserLibrary> unsorted = library.getUsersBooks();
+        Map<String, UserLibrary> sorted = new LinkedHashMap<>();
+
+        unsorted.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, UserLibrary>comparingByValue())
+                .forEachOrdered(x -> sorted.put(x.getKey(),x.getValue()));
+
+        sorted.values().forEach(System.out::println);
     }
 
     private void exit(){

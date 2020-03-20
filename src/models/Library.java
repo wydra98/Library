@@ -1,23 +1,63 @@
 package models;
 
+import exception.NoBooksException;
 import exception.NoMoreSpaceException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.InputMismatchException;
+
 public class Library {
-    private final static int MAX_PUBLICATION = 2000;
-    private Publication[] publicationRepository = new Publication[MAX_PUBLICATION];
-    private int booksNumber = 0;
+    private ArrayList<Publication> allPublicationInLibrary = new ArrayList<>();
+    private HashMap<String,UserLibrary> usersBooks = new HashMap<>();
 
-    public Publication[] getPublicationRepository() {
-        return publicationRepository;
+    public HashMap<String, UserLibrary>getUsersBooks() {
+        return usersBooks;
     }
 
-    public void add(Publication pub){
-        if(booksNumber<MAX_PUBLICATION){
-            publicationRepository[booksNumber] = pub;
-            booksNumber+=1;
+    public UserLibrary showUserLibrary(String pesel){
+        return usersBooks.get(pesel);
+    }
+
+    public Collection<UserLibrary> returnUsers(){
+        return usersBooks.values();
+    }
+
+    public void checkThisBookInRepo(Book book){
+        if(!allPublicationInLibrary.contains(book)){
+            throw new NoBooksException("Nie ma takiej książki w repozytorium");
         }
-        else
-            throw new NoMoreSpaceException("Brak miejsca!");
     }
+
+    public void checkIfPeselIsUnique(String pesel) {
+        if(usersBooks.keySet().contains(pesel)){
+            throw new InputMismatchException();
+        }
+    }
+
+    public void addUser(String pesel, UserLibrary lib) {
+        usersBooks.put(pesel, lib);
+    }
+
+    public void removeUser(String pesel) {
+        usersBooks.remove(pesel);
+    }
+
+    public ArrayList<Publication> getAllPublicationInLibrary() {
+        return allPublicationInLibrary;
+    }
+
+    public void addPublication(Publication pub) {
+        allPublicationInLibrary.add(pub);
+    }
+
+    public void removePublication(Publication pub) {
+        allPublicationInLibrary.remove(pub);
+    }
+
+
+
+
 
 }
